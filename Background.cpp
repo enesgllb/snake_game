@@ -20,9 +20,21 @@ void Background::print_grid() {
 	}
 }
 
-void Background::add_snake_to_grid() {
-	std::pair<int, int> snakePos = snake_.get_snake_pos();
+void Background::add_snake_to_grid(int gridYSize, int gridXSize) {
+	snake_.init_snake_pos(gridYSize, gridXSize);
+	auto snakePos = snake_.get_snake_pos();
 	grid_.at(snakePos.first).at(snakePos.second) = 'x';
+}
+
+void Background::add_dot_to_grid(int gridYSize, int gridXSize) {
+	dot_.init_dot_pos(gridYSize, gridXSize);
+        auto dotPos = dot_.get_dot_pos();
+	auto snakePos = snake_.get_snake_pos();
+	while (dotPos == snakePos) {
+		dot_.init_dot_pos(gridYSize, gridXSize);
+        	dotPos = dot_.get_dot_pos();
+	}
+        grid_.at(dotPos.first).at(dotPos.second) = 'o';
 }
 
 void Background::change_snake_pos(int y, int x) {
@@ -37,5 +49,6 @@ std::pair<int, int> Background::get_snake_pos() {
 }
 
 void Background::clear_screen() {
-    system("clear");
+	system("clear");
 }
+

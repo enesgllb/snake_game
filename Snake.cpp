@@ -1,17 +1,19 @@
 #include "Snake.h"
+#include "RandomPositionGenerator.h"
 
 Snake::Snake() {
-	init_snake_pos();
+	snakePos_.push_back({0, 0});
 }
 
-void Snake::init_snake_pos() {
-	snakePos_ = {7, 22}; // y and x - make this random generated
+void Snake::init_snake_pos(int gridYSize, int gridXSize) {
+	auto snakePos = RandomPositionGenerator::generate_pos(gridYSize, gridXSize);
+	set_snake_pos(snakePos.first, snakePos.second);
 }
 
 void Snake::set_snake_pos(int y, int x) {
-	snakePos_ = {y, x};
+	snakePos_.front() = {y, x};
 }
 
 std::pair<int, int> Snake::get_snake_pos() {
-	return snakePos_;
+	return snakePos_.front();
 }
