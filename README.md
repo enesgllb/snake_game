@@ -1,1 +1,1 @@
-# snake_game by enes gulleb
+# snake_game by enes g

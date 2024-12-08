@@ -1,78 +1,42 @@
-#include "Background.h"
-#include <csignal>
-#include <cstdlib>
-#include <unistd.h>
-
-void stop_program(int signal) {
-	exit(0);
-}
-
-void set_direction(const char direction, int& snakeY, int& snakeX) {
-	switch (direction) {
-		case 'L' :
-			snakeX++;
-			break;
-		case 'J' :
-			snakeX--;
-			break;
-		case 'I' :
-			snakeY--;
-			break;
-		case 'K' :
-			snakeY++;
-			break;
-		default:
-			std::cout << "Unknown direction" << std::endl;
-	}
-}
-
-void run_test_scenario_1_straight_snake_run(Background& background, int snakeY, int& snakeX, int gridXSize) {
-	background.clear_screen();
-	background.change_snake_pos(snakeY, snakeX);
-	snakeX++;
-	snakeX = snakeX % gridXSize;
-	background.print_grid();
-	usleep(200000);	
-}
-
-void run_test_scenario_2_add_dot_and_make_snake_eats_it_run(Background& background, int& snakeY, int& snakeX, int gridYSize, int gridXSize) {
-	background.clear_screen();
-	background.print_grid();
-        
-	char direction;
-	//direction = 'L'; // right +x
-	//direction = 'J'; // left -x
-	direction = 'I'; // up -y
-	//direction = 'K'; // down +y
-	
-	set_direction(direction, snakeY, snakeX);
-        snakeY = (snakeY + gridYSize) % gridYSize;
-        snakeX = (snakeX + gridXSize) % gridXSize;
-	background.change_snake_pos(snakeY, snakeX);
-
-        usleep(200000);
-}
+#include <iostream>
+#include <ncurses.h>
+#include <unistd.h> // sleep() için
+#include "Snake.h"
+#include "Dot.h"
 
 int main() {
-	signal(SIGINT, stop_program);
+    initscr();              // ncurses başlat
+    cbreak();               // Girdi tamponunu devre dışı bırak
+    noecho();               // Klavye girdisini ekrana yazdırma
+    keypad(stdscr, TRUE);   // Özel tuşları etkinleştir (örn: ok tuşları)
+    curs_set(0);            // İmleci gizle
+    nodelay(stdscr, TRUE);  // getch() bekleme yapmaz
+    
+    std::pair<int, int> gridYX{15, 35};
+    
+    Snake snake(gridYX);
+    Dot dot(gridYX, snake.get_snake_pos());
+    
+    char direction = 'r';
 
-	const int gridYSize{15};
-	const int gridXSize{35};
-	const char fillingCharacter{' '};
+    while (true) {
+        clear();                   // Ekranı temizle
 	
-	Background background(gridYSize, gridXSize, fillingCharacter);
-        background.add_snake_to_grid(gridYSize, gridXSize);
-	background.add_dot_to_grid(gridYSize, gridXSize);
+	if (!snake.set_snake_direction(direction))
+		return 0;
+        auto snakePos = snake.get_snake_pos();
+        snake.set_snake_pos(direction, snakePos, gridYX);
+        
+	auto dotPos = dot.get_dot_pos();
+        //set_dot_pos(direction, snakePos.first, snakePos.second);
+        
+	mvprintw(snakePos.first, snakePos.second, "x");
+        mvprintw(dotPos.first, dotPos.second, "o");
+        refresh();
+        usleep(150000);
+    }
 
-	std::pair<int, int> snakePos = background.get_snake_pos();
-	int snakeY = snakePos.first;
-	int snakeX = snakePos.second;
-
-	while (true) {
-		//run_test_scenario_1_straight_snake_run(background, snakeY, snakeX, gridXSize);
-		run_test_scenario_2_add_dot_and_make_snake_eats_it_run(background, snakeY, snakeX, gridYSize, gridXSize);
-	}
-
-
-	return 0;
+    endwin(); // ncurses'ten çık
+    return 0;
 }
+

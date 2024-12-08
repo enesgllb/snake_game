@@ -5,7 +5,7 @@
 
 class RandomPositionGenerator {
 public:
-	static std::pair<int, int> generate_pos(int gridYSize, int gridXSize);
+	static std::pair<int, int> generate_pos(const std::pair<int, int>& gridYX);
 };
 
 
