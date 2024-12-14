@@ -4,6 +4,25 @@
 #include "Snake.h"
 #include "Dot.h"
 
+void print_borders(std::pair<int, int> gridYX) {
+	for (int i = 0; i < gridYX.first + 1; ++i) {
+                mvprintw(i, 0, "|");
+                //mvprintw(i, 0, std::to_string(i).c_str());
+        }
+
+	for (int i = 0; i < gridYX.first + 1; ++i) {
+                mvprintw(i, gridYX.second + 1, "|");
+        }
+
+	for (int i = 0; i < gridYX.second + 2; ++i) {
+                mvprintw(0, i, "-");
+        }
+
+        for (int i = 0; i < gridYX.second + 2; ++i) {
+                mvprintw(gridYX.first, i, "-");
+        }
+}
+
 int main() {
     initscr();              // ncurses başlat
     cbreak();               // Girdi tamponunu devre dışı bırak
@@ -20,18 +39,23 @@ int main() {
     char direction = 'r';
 
     while (true) {
-        clear();                   // Ekranı temizle
+        clear();
 	
 	if (!snake.set_snake_direction(direction))
 		return 0;
-        auto snakePos = snake.get_snake_pos();
+	auto snakePos = snake.get_snake_pos();
         snake.set_snake_pos(direction, snakePos, gridYX);
         
 	auto dotPos = dot.get_dot_pos();
-        //set_dot_pos(direction, snakePos.first, snakePos.second);
+	if (snakePos == dotPos) {
+		snake.extend_snake();
+        	dot.set_dot_pos(gridYX, snake.get_whole_snake());
+	}
+	
+	print_borders(gridYX);
+	snake.print_snake();
+	dot.print_dot();
         
-	mvprintw(snakePos.first, snakePos.second, "x");
-        mvprintw(dotPos.first, dotPos.second, "o");
         refresh();
         usleep(150000);
     }
