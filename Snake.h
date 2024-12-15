@@ -18,6 +18,7 @@ public:
 	void set_snake_pos(char direction, std::pair<int, int>& snakePos, const std::pair<int, int>& gridYX);
 	void extend_snake();
 	void print_snake();
+	bool check_if_snake_hits_itself();
 private:
 	std::vector<std::pair<int, int> >snakePos_;
 	std::pair<int, int> snakeFarthestTailPos_;

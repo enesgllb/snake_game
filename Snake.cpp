@@ -30,33 +30,32 @@ void Snake::set_snake_pos(char direction, std::pair<int, int>& snakePos, const s
 	int& snakeX = snakePos.second;
     	switch (direction) {
         	case 'r': 
-		snakeX++; 
-		snakeX = (snakeX + gridYX.second) % gridYX.second;
-		if (0 == snakeX) snakeX = 1;
-		break;
+			snakeX++; 
+			snakeX = (snakeX + gridYX.second) % gridYX.second;
+			if (0 == snakeX) snakeX = 1;
+			break;
 
         	case 'l': 
-		snakeX--; 
-		snakeX = (snakeX + gridYX.second) % gridYX.second;
-		if (0 == snakeX) snakeX = gridYX.second - 1;
-		break;
+			snakeX--; 
+			snakeX = (snakeX + gridYX.second) % gridYX.second;
+			if (0 == snakeX) snakeX = gridYX.second - 1;
+			break;
         	
 		case 'u': 
-		snakeY--;
-		snakeY = (snakeY + gridYX.first) % gridYX.first;
-		if (0 == snakeY) snakeY = gridYX.first - 1;
-		break;
+			snakeY--;
+			snakeY = (snakeY + gridYX.first) % gridYX.first;
+			if (0 == snakeY) snakeY = gridYX.first - 1;
+			break;
         	
 		case 'd': 
-		snakeY++; 
-		snakeY = (snakeY + gridYX.first) % gridYX.first;
-		if (0 == snakeY) snakeY = 1;
-		break;
+			snakeY++; 
+			snakeY = (snakeY + gridYX.first) % gridYX.first;
+			if (0 == snakeY) snakeY = 1;
+			break;
         	
-		default: std::cout << "Unknown direction" << std::endl; break;
+		default: 
+			std::cout << "Unknown direction" << std::endl; break;
     	}
-    	//snakeY = ((snakeY + gridYX.first) % gridYX.first) + 1;
-    	//snakeX = ((snakeX + gridYX.second) % gridYX.second) + 1;
 	
 	snakeFarthestTailPos_ = snakePos_.back();
 	for (int i = snakePos_.size() - 1; i > 0; --i) {
@@ -82,4 +81,17 @@ void Snake::print_snake() {
 	for (int i = 1; i < snakePos_.size(); ++i) {
 		mvprintw(snakePos_.at(i).first, snakePos_.at(i).second, "x");
 	}
+}
+
+bool Snake::check_if_snake_hits_itself() {
+        auto it = std::find_if(snakePos_.begin()+1, snakePos_.end(),
+                           [this](const std::pair<int, int>& p) {
+                               return p == snakePos_.front();
+                           });
+
+        if (it != snakePos_.end()) {
+		return false;
+        }
+
+	return true;
 }

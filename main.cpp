@@ -4,25 +4,11 @@
 #include "Snake.h"
 #include "Dot.h"
 
-void print_borders(std::pair<int, int> gridYX) {
-	for (int i = 0; i < gridYX.first + 1; ++i) {
-                mvprintw(i, 0, "|");
-                //mvprintw(i, 0, std::to_string(i).c_str());
-        }
+constexpr std::pair<int, int> gridYX{15, 35};
 
-	for (int i = 0; i < gridYX.first + 1; ++i) {
-                mvprintw(i, gridYX.second + 1, "|");
-        }
-
-	for (int i = 0; i < gridYX.second + 2; ++i) {
-                mvprintw(0, i, "-");
-        }
-
-        for (int i = 0; i < gridYX.second + 2; ++i) {
-                mvprintw(gridYX.first, i, "-");
-        }
-}
-
+void print_borders();
+void game_over_operation();
+    
 int main() {
     initscr();              // ncurses başlat
     cbreak();               // Girdi tamponunu devre dışı bırak
@@ -30,8 +16,6 @@ int main() {
     keypad(stdscr, TRUE);   // Özel tuşları etkinleştir (örn: ok tuşları)
     curs_set(0);            // İmleci gizle
     nodelay(stdscr, TRUE);  // getch() bekleme yapmaz
-    
-    std::pair<int, int> gridYX{15, 35};
     
     Snake snake(gridYX);
     Dot dot(gridYX, snake.get_snake_pos());
@@ -45,6 +29,10 @@ int main() {
 		return 0;
 	auto snakePos = snake.get_snake_pos();
         snake.set_snake_pos(direction, snakePos, gridYX);
+	if (!snake.check_if_snake_hits_itself()) {
+		game_over_operation();
+		return 0;
+	}
         
 	auto dotPos = dot.get_dot_pos();
 	if (snakePos == dotPos) {
@@ -52,7 +40,7 @@ int main() {
         	dot.set_dot_pos(gridYX, snake.get_whole_snake());
 	}
 	
-	print_borders(gridYX);
+	print_borders();
 	snake.print_snake();
 	dot.print_dot();
         
@@ -64,3 +52,33 @@ int main() {
     return 0;
 }
 
+void print_borders() {
+        for (int i = 0; i < gridYX.first + 1; ++i) {
+                mvprintw(i, 0, "|");
+        }
+
+        for (int i = 0; i < gridYX.first + 1; ++i) {
+                mvprintw(i, gridYX.second + 1, "|");
+        }
+
+        for (int i = 0; i < gridYX.second + 2; ++i) {
+                mvprintw(0, i, "-");
+        }
+
+        for (int i = 0; i < gridYX.second + 2; ++i) {
+                mvprintw(gridYX.first, i, "-");
+        }
+}
+
+void game_over_operation() {
+    	for (int i = 0; i < 3; ++i) {
+		clear();
+		print_borders();
+		mvprintw(gridYX.first / 2, gridYX.second / 2 - 5, "GAME OVER !!!");
+		refresh();  // Ekranı günceller ve yazıyı gösterir.
+		usleep(700000);
+		mvprintw(gridYX.first / 2, gridYX.second / 2 - 5, "             ");
+		refresh();  // Temizlenen ekranı güncelle
+		usleep(600000);  // 400ms bekle
+	}
+}
